@@ -11,4 +11,8 @@ Route::get('/user', function (Request $request) {
 Route::prefix('inspections')
     ->group(function () {
         Route::post('', [InspectionController::class, 'create']);
+        Route::put('{id}', [InspectionController::class, 'update']);
+        Route::get('', [InspectionController::class, 'getAll']);
+        Route::get('{id}', [InspectionController::class, 'getById']);
+        Route::delete('{id}', [InspectionController::class, 'delete']);
     });
