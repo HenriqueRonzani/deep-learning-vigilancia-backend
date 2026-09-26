@@ -1,58 +1,129 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 Deep Learning Vigilância - Backend (API)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este é o repositório do backend da aplicação. O projeto utiliza
+**Laravel Sail** (Docker) para o ambiente de desenvolvimento, provendo uma
+infraestrutura completa com banco de dados (PostgreSQL), simulação de filas
+locais (Redis) e armazenamento de arquivos compatível com S3 (Silo/MinIO).
 
-## About Laravel
+## 📋 Pré-requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Docker](https://www.docker.com) e Docker Compose
+  instalados e rodando.
+- [Composer](https://getcomposer.org) e PHP instalados localmente na
+  sua máquina (opcional, mas recomendado para a primeira instalação).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Passo a Passo para Instalação
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Clone o repositório
 
 ```bash
-composer require laravel/boost --dev
+git clone <url-do-repositorio>
+cd deep-learning-vigilancia-backend
 
-php artisan boost:install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Configure as variáveis de ambiente
 
-## Contributing
+Crie o seu arquivo de configuração local copiando o arquivo de exemplo:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+cp .env.example .env
 
-## Code of Conduct
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+_(Nota: O `.env.example` já vem pré-configurado com as credenciais padrão do
+Docker. Não é necessário alterar senhas para o ambiente de desenvolvimento)._
 
-## Security Vulnerabilities
+### 3. Instale as dependências
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Se você possui o PHP/Composer instalados no seu sistema operacional
+(ex: Arch Linux, Ubuntu, MacOS), rode:
 
-## License
+```bash
+composer install
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+
+> 💡 **Não tem o PHP localmente?** Sem problemas. Você pode usar um container
+> descartável do Docker para instalar as dependências rodando:
+>
+> ```bash
+> docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" \
+>   -w /var/www/html laravelsail/php83-composer:latest \
+>   composer install --ignore-platform-reqs
+>
+> ```
+
+### 4. Suba a infraestrutura do projeto
+
+Inicie os containers do Laravel Sail em segundo plano:
+
+```bash
+./vendor/bin/sail up -d
+
+```
+
+### 5. Gere a chave da aplicação e configure o Banco de Dados
+
+Com os containers rodando, gere a chave de criptografia do Laravel:
+
+```bash
+./vendor/bin/sail artisan key:generate
+
+```
+
+Em seguida, rode as migrations para criar as tabelas no PostgreSQL:
+
+```bash
+./vendor/bin/sail artisan migrate
+
+```
+
+---
+
+## 📦 Serviços Locais (Simulando AWS)
+
+Para facilitar o desenvolvimento, este projeto não bate na infraestrutura
+real da AWS no ambiente local.
+
+### 🪣 Armazenamento (S3 Local)
+
+Utilizamos o **Silo** (fork do MinIO) para receber os uploads de arquivos
+e testes de _Pre-signed URLs_.
+
+- **Painel de Controle:** <http://localhost:8900>
+- **Usuário:** `sail`
+- **Senha:** `password`
+
+### 📨 Filas de Processamento (SQS Local)
+
+Localmente, usamos o **Redis** (`QUEUE_CONNECTION=redis` no `.env`) para
+gerenciar as filas. A aplicação despacha os Jobs normalmente, e eles
+ficam armazenados no Redis.
+
+_(Lembrete: Em produção, o `.env` utilizará o driver `sqs` para enviar as
+mensagens para a AWS, que serão consumidas pelo Modal.com)._
+
+---
+
+## 💻 Comandos Úteis (Atalho do Sail)
+
+Para não precisar digitar `./vendor/bin/sail` o tempo todo,
+recomendamos criar um alias no seu sistema.
+
+Adicione esta linha no seu `~/.bashrc` ou `~/.zshrc`:
+
+```bash
+alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
+
+```
+
+Depois de reiniciar o terminal (ou rodar `source ~/.zshrc`), você
+poderá usar comandos curtos e rápidos:
+
+- `sail up -d` (Sobe o ambiente)
+- `sail down` (Derruba o ambiente)
+- `sail test` (Roda os testes automatizados)
+- `sail artisan make:controller NomeController`
