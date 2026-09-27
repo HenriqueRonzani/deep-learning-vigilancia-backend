@@ -18,8 +18,8 @@ return new class extends Migration
                 ->on('files');
             $table->enum('irregularity', ['open_water_tank', 'abandoned_pool']);
             $table->enum('status', ['created', 'provided_feedback']);
-            $table->string('agent_report');
-            $table->string('user_feedback')->nullable();
+            $table->text('agent_report');
+            $table->enum('user_feedback', ['correct', 'incorrect'])->nullable();
             $table->foreignId('feedback_by')
                 ->nullable()
                 ->references('id')
