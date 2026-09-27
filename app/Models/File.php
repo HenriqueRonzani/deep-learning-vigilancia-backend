@@ -8,18 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'address', 'type', 'status', 'dengue_breeding_site_spotted', 'requested_by'])]
-class Inspection extends Model
+#[Fillable(['name', 'path', 'mime_type', 'inspection_id'])]
+class File extends Model
 {
     use HasFactory;
-
-    public function requester(): BelongsTo
+    public function inspection(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Inspection::class);
     }
 
-    public function files(): HasMany
+    public function fileReports(): HasMany
     {
-        return $this->hasMany(File::class, 'inspection_id');
+        return $this->hasMany(FileReport::class, 'file_id');
     }
 }
