@@ -81,6 +81,14 @@ Em seguida, rode as migrations para criar as tabelas no PostgreSQL:
 
 ```
 
+### 6. Valide a instalação (Testes)
+
+Para garantir que a comunicação com o banco de dados e o ambiente de testes subiram corretamente, rode a suíte de testes:
+
+```bash
+./vendor/bin/sail test
+```
+
 ---
 
 ## 📦 Serviços Locais (Simulando AWS)
