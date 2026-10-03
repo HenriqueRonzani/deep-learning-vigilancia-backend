@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\FileReport;
 use App\Models\Inspection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -72,5 +73,15 @@ class InspectionTest extends TestCase
         $response->assertOk();
         $this->assertDatabaseHas('files', ['path' => "inspections/{$inspection->id}/raw/video.mp4"]);
         $this->assertDatabaseHas('inspections', ['id' => $inspection->id, 'status' => 'queued']);
+    }
+
+    public function test_can_get_inspection_with_file()
+    {
+        $report = FileReport::factory()->create();
+        $inspection = $report->file->inspection;
+
+        $response = $this->getJson("/api/inspections/{$inspection->id}");
+
+        $response->assertOk();
     }
 }
