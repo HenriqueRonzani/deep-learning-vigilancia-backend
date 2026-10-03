@@ -18,7 +18,10 @@ class File extends Model
     public function url(): Attribute
     {
         return Attribute::make(
-            get: fn() => \Storage::disk('s3')->url($this->path)
+            get: fn() => \Storage::disk('s3')->temporaryUrl(
+                $this->path,
+                now()->addHours(12)
+            )
         );
     }
     public function inspection(): BelongsTo
