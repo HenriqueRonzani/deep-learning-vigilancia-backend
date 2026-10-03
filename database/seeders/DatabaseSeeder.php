@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\FileReport;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,11 +16,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Gonna create a file, an inspection and a user to reach one of these
+        FileReport::factory(50)->create();
     }
 }
